@@ -1,23 +1,21 @@
-version: '3.7'
+version: "3.7"
 services:
   zookeeper:
     image: wurstmeister/zookeeper:3.4.6
   kafka:
     image: wurstmeister/kafka:2.12-2.5.0
-    ports:
-      - 9092:9092
-    links:
+    container_name: kafka
+    depends_on:
       - zookeeper
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "review-by-product-event:1:1,product-info-event:1:1"
-  mysql-review:
-    image: mysql:8.0.25
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    container_name: mysql-review
+  dbreview:
+    image: mysql:8.0
     restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
     ports:
       - 3306:3306
     environment:
@@ -25,5 +23,12 @@ services:
       MYSQL_USER: reviewuser
       MYSQL_PASSWORD: reviewpass
       MYSQL_ROOT_PASSWORD: reviewpass
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+  reviews:
+    image: alvarocar/reviews-spring:1.0.0
+    command: sh -c './wait-for dbreview:3306 -- npm start'
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - dbreview
+      - kafka

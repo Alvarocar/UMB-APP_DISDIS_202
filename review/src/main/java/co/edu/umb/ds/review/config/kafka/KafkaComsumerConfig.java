@@ -3,6 +3,7 @@ package co.edu.umb.ds.review.config.kafka;
 import co.edu.umb.ds.review.persistence.constants.EKafka;
 import co.edu.umb.ds.review.persistence.dto.ProductDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class KafkaComsumerConfig {
   @Bean
   public ConsumerFactory<String, ProductDto> productDtoConsumerFactory() {
     Map<String, Object> config = new HashMap<>();
-    config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, EKafka.BOOTSTRAP_SERVER_KAFKA.getMessage());
+    config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, EKafka.BOOTSTRAP_SERVER_KAFKA.getMessage());
     config.put(ConsumerConfig.GROUP_ID_CONFIG, EKafka.GROUP_ID.getMessage());
     config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
